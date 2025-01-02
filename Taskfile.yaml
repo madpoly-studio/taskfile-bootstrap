@@ -1,0 +1,24 @@
+version: '3'
+
+vars:
+  TASKFILE_TEMPLATE_URL: "https://git-gst.mto.zing.vn/mps/devops/taskfile-templates.git"
+
+env:
+  TASKFILE_TEMPLATE_REF: master
+
+tasks:
+  bootstrap:
+    desc: "Clone MPS Taskfile templates to .task/templates folder"
+    cmds:
+      - cmd: |
+
+          rm -rf .task/templates && mkdir -p .task/templates
+
+          url="{{.TASKFILE_TEMPLATE_URL}}"
+          if [[ "$CI" == "true" ]]; then
+            protocol="${url%%://*}"
+            host="${url#*://}"
+            url="${protocol}://gitlab-ci-token:${CI_JOB_TOKEN}@${host}"
+          fi
+
+          git clone -b "$TASKFILE_TEMPLATE_REF" "$url" .task/templates
