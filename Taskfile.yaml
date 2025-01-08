@@ -9,10 +9,9 @@ env:
 tasks:
   bootstrap:
     desc: "Clone MPS Taskfile templates to .task/templates folder"
+    aliases: [bs, "."]
     cmds:
       - cmd: |
-
-          rm -rf .task/templates && mkdir -p .task/templates
 
           url="{{.TASKFILE_TEMPLATE_URL}}"
           if [[ "$CI" == "true" ]]; then
@@ -21,4 +20,9 @@ tasks:
             url="${protocol}://gitlab-ci-token:${CI_JOB_TOKEN}@${host}"
           fi
 
-          git clone -b "$TASKFILE_TEMPLATE_REF" "$url" .task/templates
+          if [ -f ".task/templates/.git/config" ]; then
+            cd .task/templates
+            git fetch && git reset --hard origin/"$TASKFILE_TEMPLATE_REF"
+          else
+            git clone -b "$TASKFILE_TEMPLATE_REF" "$url" .task/templates
+          fi
