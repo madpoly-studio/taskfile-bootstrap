@@ -11,6 +11,8 @@ tasks:
     desc: "Clone MPS Taskfile templates to .task/templates folder"
     aliases: [bs, "."]
     cmds:
+      # See https://stackoverflow.com/questions/4630704/receiving-fatal-not-a-git-repository-when-attempting-to-remote-add-a-git-repo
+      - cmd: git config --global --add safe.directory $PWD
       - cmd: |
 
           url="{{.TASKFILE_TEMPLATE_URL}}"
@@ -26,3 +28,5 @@ tasks:
           else
             git clone -b "$TASKFILE_TEMPLATE_REF" "$url" .task/templates
           fi
+      # See https://stackoverflow.com/questions/18329621/how-to-store-a-git-config-as-part-of-the-repository
+      - cmd: if [ -f ".task/templates/.gitconfig" ]; then git config include.path ../.task/templates/.gitconfig; fi
