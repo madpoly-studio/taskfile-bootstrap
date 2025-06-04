@@ -27,10 +27,15 @@ task bootstrap --yes
 
 template_files=($(find .task/templates/project -type f -name '*.gomplate'))
 for _file in "${template_files[@]}"; do
-  file=$(basename ${_file%.gomplate})
+  file=$(basename "${_file%.gomplate}")
+  dest="$file"
+  # For backwards compatibility with helmfile v0. Helmfile v1 uses helmfile.yaml.gotmpl in case you want helmfile to render it as a go template before yaml parsing
+  if [[ "$file" == "helmfile.yaml"* ]]; then
+    dest="helmfile.yaml.gotmpl"
+    file="helmfile.yaml"
+  fi
   if grep -q "$file" .gitignore; then
-    _cmd="cp $_file $file"
-    echo "$_cmd"
-    eval "$_cmd"
+    echo "cp $_file $dest"
+    cp "$_file" "$dest"
   fi
 done
